@@ -20,12 +20,12 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use("/", express.static('user_data'))
 
 
-app.post('/img_entrena', async (req, res) => {
-    console.log('/img_entrena')//, req.body);
+app.post('/foto_entrenamiento', async (req, res) => {
+    console.log('/foto_entrenamiento')//, req.body);
     try {
         const TS_REQ = new Date()
 
-        if (!req.body?.titulo || req.body?.titulo?.length > 255) {
+        if (!req.body?.objeto || req.body?.objeto?.length > 255) {
             return res.status(200).send({ "stat": false, error: "Revise el título." });
         }
 
@@ -39,25 +39,23 @@ app.post('/img_entrena', async (req, res) => {
 
         let files_data = []
 
-        for (let i = 0; i < req.body?.imagenes?.length; i++) {
-            const IMG          = req.body.imagenes[i].base64
-            const ID_IMG       = uuid.v7()
-            const base64String = IMG.split(',');
-            const extension    = base64String[0].split(':')[1].split(';')[0].replace('/', '.')
-            const fileName     = "./user_data/" + ID_IMG + extension
-            const buffer       = Buffer.from(base64String[1], 'base64');
-            fs.writeFileSync(fileName, buffer)
+        const IMG          = req.body.imagen.base64
+        const ID_IMG       = uuid.v7()
+        const base64String = IMG.split(',');
+        const extension    = base64String[0].split(':')[1].split(';')[0].replace('/', '.')
+        const fileName     = "./user_data/" + ID_IMG + extension
+        const buffer       = Buffer.from(base64String[1], 'base64');
+        fs.writeFileSync(fileName, buffer)
 
-            files_data.push({ id: ID_IMG, extension: extension })
-        }
+        files_data.push({ id: ID_IMG, extension: extension })
         
 
         const INS_OBJ = {
             id: uuid.v7(),
-            titulo: req.body.titulo,
+            objeto: req.body.objeto,
             detalles: req.body.detalles,
             posicion: JSON.stringify(req.body.posicion),
-            imagenes: JSON.stringify(files_data),
+            imagen: JSON.stringify(files_data),
             ts: TS_REQ,
             ipv4: req.header('x-forwarded-for') ? req.header('x-forwarded-for') : '-',
             ipv6: '-',
@@ -65,7 +63,7 @@ app.post('/img_entrena', async (req, res) => {
         }
 
         console.log(INS_OBJ)
-        await global.knex('img_entrena').insert(INS_OBJ);
+        await global.knex('foto_entrenamiento').insert(INS_OBJ);
         return res.status(200).send({ "stat": true });
     } catch (error) {
         console.log(error)
