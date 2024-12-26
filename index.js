@@ -39,7 +39,7 @@ app.post('/foto_reconocimiento', async (req, res) => {
         const TS_REQ = new Date()
 
         const IMG          = req.body.base64
-        const ID_IMG       = uuid.v7()
+        const ID_IMG       = "reconocimiento"
         const base64String = IMG.split(',');
         const extension    = base64String[0].split(':')[1].split(';')[0].replace('/', '.')
         const fileName     = "./tmp_data/" + ID_IMG + extension
