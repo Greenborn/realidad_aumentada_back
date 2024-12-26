@@ -20,6 +20,19 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use("/", express.static('user_data'))
 
 
+app.get('/get_fotos_entrenamiento', async (req, res) => {
+    console.log('/get_fotos_entrenamiento')//, req.body);
+
+    try {
+        let data_ = await global.knex('foto_entrenamiento')
+        
+        return res.status(200).send({ "stat": true, "data": data_ });
+    } catch (error) {
+        console.log(error)
+        return res.status(200).send({ "stat": false, error: "Error Interno, reintente luego." });
+    }
+})
+
 app.post('/foto_entrenamiento', async (req, res) => {
     console.log('/foto_entrenamiento')//, req.body);
     try {
