@@ -4,6 +4,7 @@ const bodyParser = require("body-parser")
 const fs         = require("fs")
 const uuid       = require("uuid")
 const {PythonShell} =require('python-shell');
+const axios = require('axios')
 dotenv.config();
 
 const app  = express();
@@ -20,6 +21,10 @@ app.use(cors(corsOptions))
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use("/", express.static('user_data'))
 
+PythonShell.run('reconocimiento.py', {}).then(messages=>{
+    // results is an array consisting of messages collected during execution
+    console.log('results: %j', messages);
+});
 
 app.get('/get_fotos_entrenamiento', async (req, res) => {
     console.log('/get_fotos_entrenamiento')//, req.body);
@@ -59,11 +64,13 @@ app.post('/foto_reconocimiento', async (req, res) => {
             user_agent: req.header('user-agent') ? req.header('user-agent') : '-',
         }
 
-        PythonShell.run('reconocimiento.py', {}).then(messages=>{
-            // results is an array consisting of messages collected during execution
-            console.log('results: %j', messages);
-            return res.status(200).send({ "stat": true });
-        });
+        axios.get('http://127.0.0.1:3333/process')
+            .then(response => {
+                return res.status(200).send({ "stat": true });
+            })
+            .catch(error => {
+                return res.status(200).send({ "stat": false, error: "Error Interno, fallo peticion con servicio de reconocimiento." });
+            });
     } catch (error) {
         console.log(error)
         return res.status(200).send({ "stat": false, error: "Error Interno, reintente luego." });
