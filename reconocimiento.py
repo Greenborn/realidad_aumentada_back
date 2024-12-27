@@ -5,13 +5,12 @@ from flask import *
 
 app = Flask( __name__ )
 
+# Download model from github
+model = torch.hub.load('ultralytics/yolov5', 'yolov5n')
+
 @app.route("/process")
 def home():
-    # Download model from github
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5n')
-
-    img = cv2.imread('tmp_data/reconocimientoimage.png')
-    img = cv2.resize(img,(1000, 650))
+    img = cv2.imread('tmp_data/reconocimientoimage.webp')
 
     # Perform detection on image
     result = model(img)
@@ -24,6 +23,7 @@ def home():
 
     # Get indexes of all of the rows
     indexes = data_frame.index
+    data_ = []
     for index in indexes:
         # Find the coordinate of top left corner of bounding box
         x1 = int(data_frame['xmin'][index])
@@ -41,8 +41,9 @@ def home():
         cv2.rectangle(img, (x1,y1), (x2,y2), (255,255,0), 2)
         cv2.putText(img, text, (x1,y1-5), cv2.FONT_HERSHEY_PLAIN, 2,
                     (255,255,0), 2)
+        data_.append( { 'x1': x1, 'y1': y1, 'x2': x2, 'y2': y2, 'label': label, 'text': text } )
 
-    cv2.imwrite('user_data/reconocimiento_ok.jpg', img)
-    return "ok"
+    #cv2.imwrite('user_data/reconocimiento_ok.jpg', img)
+    return data_
 
 app.run(port=3333)

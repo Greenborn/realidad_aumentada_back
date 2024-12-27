@@ -63,10 +63,10 @@ app.post('/foto_reconocimiento', async (req, res) => {
             ipv6: '-',
             user_agent: req.header('user-agent') ? req.header('user-agent') : '-',
         }
-
+        console.log('pide recon')
         axios.get('http://127.0.0.1:3333/process')
-            .then(response => {
-                return res.status(200).send({ "stat": true });
+            .then(response => { console.log('recon_ok')
+                return res.status(200).send({ "stat": true, data: response?.data });
             })
             .catch(error => {
                 return res.status(200).send({ "stat": false, error: "Error Interno, fallo peticion con servicio de reconocimiento." });
