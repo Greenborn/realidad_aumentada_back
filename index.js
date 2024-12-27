@@ -22,8 +22,7 @@ app.use(bodyParser.json({ limit: '10mb' }));
 app.use("/", express.static('user_data'))
 
 PythonShell.run('reconocimiento.py', {}).then(messages=>{
-    // results is an array consisting of messages collected during execution
-    console.log('results: %j', messages);
+   console.log('results: %j', messages);
 });
 
 app.get('/get_fotos_entrenamiento', async (req, res) => {
@@ -42,29 +41,8 @@ app.get('/get_fotos_entrenamiento', async (req, res) => {
 app.post('/foto_reconocimiento', async (req, res) => {
     console.log('/foto_reconocimiento')//, req.body);
     try {
-        const TS_REQ = new Date()
-
-        const IMG          = req.body.base64
-        const ID_IMG       = "reconocimiento"
-        const base64String = IMG.split(',');
-        const extension    = base64String[0].split(':')[1].split(';')[0].replace('/', '.')
-        const fileName     = "./tmp_data/" + ID_IMG + extension
-        const buffer       = Buffer.from(base64String[1], 'base64');
-        fs.writeFileSync(fileName, buffer)
-       
-        const INS_OBJ = {
-            id: uuid.v7(),
-            objeto: req.body.objeto,
-            detalles: req.body.detalles,
-            posicion: JSON.stringify(req.body.posicion),
-            imagen: { id: ID_IMG, extension: extension },
-            ts: TS_REQ,
-            ipv4: req.header('x-forwarded-for') ? req.header('x-forwarded-for') : '-',
-            ipv6: '-',
-            user_agent: req.header('user-agent') ? req.header('user-agent') : '-',
-        }
         console.log('pide recon')
-        axios.get('http://127.0.0.1:3333/process')
+        axios.post('http://127.0.0.1:3333/process',{ base64: req.body.base64 })
             .then(response => { console.log('recon_ok')
                 return res.status(200).send({ "stat": true, data: response?.data });
             })

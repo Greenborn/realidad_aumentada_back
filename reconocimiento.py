@@ -2,15 +2,26 @@
 import torch
 import cv2
 from flask import *
+import base64
+from flask import request
+import numpy as np
 
 app = Flask( __name__ )
 
 # Download model from github
 model = torch.hub.load('ultralytics/yolov5', 'yolov5n')
 
-@app.route("/process")
+def readb64(uri):
+   encoded_data = uri.split(',')[1]
+   nparr = np.fromstring(base64.b64decode(encoded_data), np.uint8)
+   img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+   return img
+
+@app.route("/process", methods=['POST'])
 def home():
-    img = cv2.imread('tmp_data/reconocimientoimage.webp')
+    base64_ = request.json["base64"]
+    #print(base64_)
+    img = readb64(base64_)
 
     # Perform detection on image
     result = model(img)
