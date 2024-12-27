@@ -8,5 +8,11 @@
     "mysql2": "^3.12.0",
     "python-shell": "^5.0.0",
     "uuid": "^11.0.3"
+  },
+  "scripts": {
+    "start": "nodemon server.js"
+  },
+  "nodemonConfig": {
+      "ignore": ["user_data/*", "tmp/*"]
   }
 }

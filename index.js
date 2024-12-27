@@ -29,9 +29,12 @@ app.get('/get_fotos_entrenamiento', async (req, res) => {
     console.log('/get_fotos_entrenamiento')//, req.body);
 
     try {
-        let data_ = await global.knex('foto_entrenamiento')
-        
-        return res.status(200).send({ "stat": true, "data": data_ });
+        let data_ = global.knex('foto_entrenamiento')
+        //por defecto solo se traen las que no tienen anotaciones
+        if (!req.query?.todas)
+            data_ = data_.where('metadata', 'is', null) 
+
+        return res.status(200).send({ "stat": true, "data": await data_ });
     } catch (error) {
         console.log(error)
         return res.status(200).send({ "stat": false, error: "Error Interno, reintente luego." });
