@@ -38,3 +38,4 @@ for index in indexes:
                 (255,255,0), 2)
 
 cv2.imwrite('user_data/reconocimiento_ok.jpg', img)
+exit(0)

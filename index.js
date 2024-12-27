@@ -3,6 +3,7 @@ const dotenv     = require('dotenv');
 const bodyParser = require("body-parser")
 const fs         = require("fs")
 const uuid       = require("uuid")
+const {PythonShell} =require('python-shell');
 dotenv.config();
 
 const app  = express();
@@ -58,9 +59,11 @@ app.post('/foto_reconocimiento', async (req, res) => {
             user_agent: req.header('user-agent') ? req.header('user-agent') : '-',
         }
 
-        console.log(INS_OBJ)
-        
-        return res.status(200).send({ "stat": true });
+        PythonShell.run('reconocimiento.py', {}).then(messages=>{
+            // results is an array consisting of messages collected during execution
+            console.log('results: %j', messages);
+            return res.status(200).send({ "stat": true });
+        });
     } catch (error) {
         console.log(error)
         return res.status(200).send({ "stat": false, error: "Error Interno, reintente luego." });
